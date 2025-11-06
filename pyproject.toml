@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gtm-factory"
+version = "0.1.0"
+description = "Chat-based GTM research system with compounding knowledge"
+requires-python = ">=3.10"
+dependencies = [
+    "anthropic>=0.40.0",
+    "gpt-researcher",
+    "pydantic",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["core*"]
+exclude = ["tests*", "logs*", "agents*", "prompts*", "projects*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]

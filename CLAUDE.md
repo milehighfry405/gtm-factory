@@ -1,0 +1,257 @@
+# GTM Factory - Coordination File
+
+**Last Updated**: 2025-11-06 (Session 2 complete - HQ Orchestrator)
+
+---
+
+## START HERE (Every Session)
+
+**First**: Read `/.claude/commands/onboard.md` and follow it (3 steps, <10 seconds)
+
+**Then**: Read this file to understand:
+- What's built (Build Status)
+- What you're building (Module Ownership)
+- Where files go (File Organization)
+- How to coordinate (Rules)
+
+**Core Principles**:
+- Update CLAUDE.md, don't create summary files
+- Your module lives in `/core/{your-area}/`
+- Reference `/prompts/`, don't copy them
+
+---
+
+## What We're Building
+
+**The System**: Chat → Socratic questioning → Research (with flag flip) → Drops → Living truth
+
+**Key Flow**:
+1. User chats with HQ (Socratic questions extract strategic WHY)
+2. User flips research flag when ready
+3. HQ proposes research plan (1-4 researchers per drop)
+4. Research runs → produces drop files
+5. After each drop: `latest.md` synthesized (handles invalidation)
+6. Repeat for next drop or finish session
+
+**File-based storage** (no Graphiti for MVP), **Progressive disclosure** (metadata → full content), **Memory tool pattern** (Anthropic)
+
+---
+
+## File Organization
+
+```
+gtm-factory/
+├── CLAUDE.md           ⭐ THIS FILE (update after work)
+├── README.md           (for users, not Claude sessions)
+│
+├── prompts/            ⭐ SHARED (all sessions reference)
+│   ├── hq-orchestrator.md
+│   ├── general-researcher.md
+│   ├── critical-analyst.md
+│   ├── latest-generator.md
+│   └── session-metadata-generator.md
+│
+├── core/               (implementation code)
+│   ├── hq/            (Session 2 builds this)
+│   ├── researcher/    (Session 3 builds this)
+│   ├── generators/    (Session 4 builds this)
+│   └── utils/         (shared utilities)
+│
+├── projects/          (runtime data - gitignored)
+│   └── {company}/
+│       └── sessions/
+│           └── session-1-{hypothesis}/
+│               ├── drops/
+│               │   └── drop-1/
+│               │       ├── researcher-1-output.md
+│               │       ├── researcher-2-output.md (if multiple)
+│               │       ├── user-context.md       ⭐ Strategic WHY
+│               │       ├── conversation-history.md ⭐ Chat history
+│               │       ├── critical-analysis.md
+│               │       └── drop-metadata.json
+│               ├── latest.md          ⭐ Living truth (synthesized)
+│               └── session-metadata.json
+│
+└── tests/
+    └── test_examples.py
+```
+
+---
+
+## Build Status
+
+### Session 1: Foundation ✅
+**Built**:
+- ✅ 5 prompts in `/prompts/`
+- ✅ Example project in `/projects/example-company/`
+- ✅ Test scenarios in `/tests/test_examples.py`
+
+### Session 1.5: Cleanup & Onboard ✅
+- ✅ Onboard plugin created at `/.claude/commands/onboard.md`
+- ✅ Root directory cleaned (only CLAUDE.md and README.md remain)
+- ✅ Session 1 artifacts archived in `/docs/archive/session-1/`
+- ✅ PROMPT_COMPARISON_ANALYSIS.md archived (Helldiver research complete)
+
+### Session 2: HQ Orchestrator ✅
+**Built**:
+- ✅ `/core/hq/orchestrator.py` - Streaming conversation handler with Socratic questioning
+- ✅ `/core/hq/context_extractor.py` - Strategic WHY extraction to UserContext dataclass
+- ✅ `/core/hq/memory_manager.py` - File-based persistence (Anthropic memory pattern)
+- ✅ `/tests/test_hq.py` - Integration tests for critical paths (save/load, drop workflow)
+
+**Key Decisions**:
+- Streaming responses using Anthropic SDK context manager
+- XML-tagged system prompts for clarity
+- Progressive disclosure via lightweight metadata
+- Integration tests catch "conversation lost" bugs (Helldiver pain point)
+
+### Session 3: Researcher (Not Started)
+**Your Job**:
+- Build `/core/researcher/general_researcher.py` - Web research wrapper
+- Build `/core/researcher/tools.py` - Search/fetch tools
+- Use prompts from `/prompts/general-researcher.md`
+- Enforce 3-5K token budget in outputs
+
+**When Done**:
+- Update this file's "Build Status"
+
+### Session 4: Generators (Not Started)
+**Your Job**:
+- Build `/core/generators/latest_generator.py`
+- Build `/core/generators/session_metadata_generator.py`
+- Synthesis + invalidation logic
+
+---
+
+## Coordination Rules
+
+### Before You Start
+1. Read this entire file
+2. Check "Build Status" - is your session's work already done?
+3. Check your module path - `/core/{your-area}/`
+4. DON'T rebuild what exists
+
+### While Working
+- Code goes in `/core/{your-module}/`
+- Reference `/prompts/` files, don't duplicate
+- Utilities that multiple modules need → `/core/utils/`
+- Tests mirror structure: `/tests/test_{your-module}.py`
+
+### When You're Done
+1. Update "Build Status" section
+2. Mark your session ✅
+3. List any new files created
+4. Update "Last Updated" date
+5. **DO NOT** create separate session summary files
+
+### Bloat Prevention
+❌ **Don't Create**:
+- SESSION_N_SUMMARY.md files
+- Duplicate documentation
+- Separate architecture docs
+
+✅ **Do Update**:
+- This file (CLAUDE.md)
+- README.md if user-facing changes
+- `/prompts/` if prompt logic changes
+
+---
+
+## Key Architectural Decisions
+
+**Pattern**: Orchestrator-Workers (Anthropic's "Building Effective Agents")
+**Memory**: File-based (Anthropic's memory tool pattern)
+**Token Budgets**: 3-5K per research output (hard limit)
+**Coordination**: This file + `/prompts/` directory
+
+**Why File-Based Not Database**:
+- Simpler for MVP
+- Human-readable outputs
+- Follows Anthropic's memory tool pattern
+- Can add database later if needed
+
+---
+
+## Key Design Decisions
+
+**Chat UI** (not CLI):
+- Conversational interface
+- Research flag toggle
+- Progress indicators during research
+
+**Dynamic Researchers**:
+- HQ decides 1-4 per drop based on complexity
+- Not fixed workers
+- Uses GPT Researcher library
+
+**File-Based Storage**:
+- No database for MVP
+- Human-readable outputs
+- Can add Graphiti/graph layer later
+
+**Drop Structure**:
+- Self-contained (full context snapshot)
+- User context at that moment
+- Conversation history included
+- Each drop = complete story
+
+**Living Truth Pattern**:
+- `latest.md` synthesizes all drops
+- Handles invalidation (strikethrough old info)
+- Always current, never stale
+- Future sessions read this, not individual drops
+
+**Progressive Disclosure**:
+- Scan metadata first (`session-index.json`)
+- Load specific `latest.md` only when needed
+- Never load all drops
+
+**Token Budgets**: 3-5K per researcher output (hard limit)
+
+---
+
+## Module Ownership
+
+| Module | Session | Status | Key Files |
+|--------|---------|--------|-----------|
+| Prompts | 1 | ✅ | `/prompts/*.md` |
+| HQ | 2 | ✅ | `/core/hq/*.py` |
+| Researcher | 3 | ⏳ | `/core/researcher/*.py` |
+| Generators | 4 | ⏳ | `/core/generators/*.py` |
+| UI | 5 | ⏳ | `/ui/*.py` |
+
+---
+
+## Dependencies
+
+```
+anthropic>=0.40.0
+gpt-researcher
+pydantic
+```
+
+---
+
+## Quick Reference
+
+**"Where do I put X?"**
+- AI prompts → `/prompts/`
+- Python code → `/core/{module}/`
+- Tests → `/tests/test_{module}.py`
+- Runtime data → `/projects/` (gitignored)
+
+**"Should I create a new file?"**
+- Prompt logic → Update existing in `/prompts/`
+- New module → Create in `/core/{new-module}/`
+- Documentation → Update CLAUDE.md or README.md
+- Summary → NO, update this file instead
+
+**"My session is done, now what?"**
+1. Update "Build Status" section
+2. Mark yourself ✅
+3. Update "Last Updated"
+4. That's it
+
+---
+
+**Current Focus**: Session 2 complete ✅ - Next: Session 3 (Researcher)
