@@ -1,6 +1,6 @@
 # GTM Factory - Coordination File
 
-**Last Updated**: 2025-11-06 (Session 3 complete - Researcher)
+**Last Updated**: 2025-11-06 (Session 4 complete ✅ - Generators)
 
 ---
 
@@ -134,11 +134,30 @@ gtm-factory/
 - Create `/tests/fixtures/` directory for pre-captured research outputs
 - Only run full test suite when necessary, not on every change
 
-### Session 4: Generators (Not Started)
-**Your Job**:
-- Build `/core/generators/latest_generator.py`
-- Build `/core/generators/session_metadata_generator.py`
-- Synthesis + invalidation logic
+### Session 4: Generators ✅
+**Built**:
+- ✅ `/core/generators/latest_generator.py` - Iterative synthesis (215 lines)
+- ✅ `/core/generators/critical_analyst_generator.py` - Critical analysis (230 lines, pokes holes in research)
+- ✅ `/core/generators/session_metadata_generator.py` - Progressive disclosure metadata (187 lines)
+- ✅ `/core/generators/__init__.py` - Package exports
+- ✅ `/tests/test_generators.py` - 9 mocked + 2 real API tests (11/11 passing)
+- ✅ `/docs/guidelines/synthesis-patterns-2025-11-06.md` - Anthropic best practices research
+
+**Key Decisions**:
+- **Three generators**: Latest (synthesis), Critical Analyst (poke holes), Session Metadata (progressive disclosure)
+- **Critical Analyst role**: Counterbalances AI agreeableness, identifies gaps for follow-on research, guides HQ conversations
+- **Iterative synthesis**: Load existing latest.md → add new drop → update incrementally (Anthropic pattern)
+- **Enhanced prompts**: Applied ALL Anthropic best practices (Chain of Thought, Examples, XML, Clear roles)
+- **Token-efficient**: 15× multi-agent multiplier awareness, just-in-time loading
+- Using GPT-4o (TODO: switch to GPT-5 when streaming ready)
+
+**Issues Resolved**:
+1. Windows emoji encoding → Removed emojis
+2. Critical Analyst misunderstanding → Clarified it analyzes researcher outputs (peer to synthesis, not downstream)
+3. Prompt engineering gaps → Researched official Anthropic docs, upgraded all prompts
+4. API credit burn → Only 2 real tests (~$0.20), rest mocked
+
+**Full Details**: docs/sessions/session-4-generators-final.md
 
 ---
 
@@ -236,7 +255,7 @@ gtm-factory/
 | Prompts | 1 | ✅ | `/prompts/*.md` |
 | HQ | 2 | ✅ | `/core/hq/*.py` |
 | Researcher | 3 | ✅ | `/core/researcher/*.py` |
-| Generators | 4 | ⏳ | `/core/generators/*.py` |
+| Generators | 4 | ✅ | `/core/generators/*.py` |
 | UI | 5 | ⏳ | `/ui/*.py` |
 
 ---
@@ -273,4 +292,4 @@ pydantic
 
 ---
 
-**Current Focus**: Session 3 complete ✅ - Next: Session 4 (Generators)
+**Current Focus**: Session 4 complete ✅ - Next: Session 5 (UI)
