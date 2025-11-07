@@ -1,8 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(pytest:*)",
-      "Bash(where:*)"
+      "Bash(pip install:*)",
+      "Bash(python -m pytest:*)",
+      "Bash(dir:*)"
     ],
     "deny": [],
     "ask": []

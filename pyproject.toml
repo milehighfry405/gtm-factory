@@ -11,11 +11,13 @@ dependencies = [
     "anthropic>=0.40.0",
     "gpt-researcher",
     "pydantic",
+    "python-dotenv",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0.0",
+    "pytest-asyncio>=1.2.0",
 ]
 
 [tool.setuptools.packages.find]
