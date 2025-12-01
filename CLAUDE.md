@@ -1,6 +1,6 @@
 # GTM Factory - Coordination File
 
-**Last Updated**: 2025-11-06 (Session 4 complete ✅ - Generators)
+**Last Updated**: 2025-11-20 (Session 6 complete ✅ - Research Quality Fix)
 
 ---
 
@@ -158,6 +158,82 @@ gtm-factory/
 4. API credit burn → Only 2 real tests (~$0.20), rest mocked
 
 **Full Details**: docs/sessions/session-4-generators-final.md
+
+### Session 5: UI ✅
+**Built**:
+- ✅ `/core/ui/` - ACI layer (state management, context tracking, adapters)
+- ✅ `/core/ui/adapters/` - HQ, Researcher, Generator adapters with progress tracking
+- ✅ `/ui/app.py` - Main Streamlit application
+- ✅ `/ui/components/` - Chat interface, context meter, file tree, progress display, logs panel
+- ✅ `/ui/utils/` - Session loader, crash recovery
+- ✅ `/tests/test_ui.py` - 10 mocked tests (all passing, $0 cost)
+- ✅ Updated `pyproject.toml` with streamlit and openai dependencies
+
+**Key Decisions**:
+- **Streamlit**: Fastest path to working chat UI with built-in streaming
+- **Adapter layer**: Thin wrappers around existing modules (no modifications to HQ/Researcher/Generators)
+- **Manual compaction control**: User decides when to compact conversation history (no auto-summarization)
+- **Simple crash recovery**: Autosave after every message, atomic writes, drop state tracking, resume detection
+- **File tree only**: No content rendering in UI (user interacts ONLY through HQ chat)
+
+**Corrected Flow** (Context extraction AFTER plan confirmation):
+1. Chat with HQ → Flip research flag → Propose plan → **Confirm plan**
+2. **Extract context NOW**: user-context.md + conversation-history.md saved to drop
+3. Execute research → Run generators → HQ loads context (latest.md + critical-analysis.md)
+4. HQ summarizes findings AND asks Socratic questions → User continues conversation
+
+**Manual Smoke Test**: Pending (~$0.20, to be run before final commit)
+
+**Full Details**: docs/sessions/session-5-ui-final.md
+
+### Session 6: Research Quality Fix ✅
+**Problem**: Research execution completed but produced ZERO sources with "I'm sorry, but I can't generate a report..." refusal messages instead of comprehensive research outputs.
+
+**Root Cause**: Passing 10k+ character mission briefing as `query` parameter to gpt-researcher, when library expects:
+- `query`: Short, focused question
+- `context`: Detailed guidance (mission briefing)
+
+**Discovery**: Through systematic API documentation, found that `GPTResearcher.__init__()` accepts a `context` parameter that was previously unknown.
+
+**Built**:
+- ✅ [docs/guidelines/gpt-researcher-api.md](docs/guidelines/gpt-researcher-api.md) - Full API documentation with correct usage patterns
+- ✅ [tests/test_gpt_researcher_api.py](tests/test_gpt_researcher_api.py) - API validation test using VCR pattern
+- ✅ [tests/test_gpt_researcher_context.py](tests/test_gpt_researcher_context.py) - Context effectiveness validation (16 vs 11 sources, +45% improvement)
+- ✅ Updated [core/researcher/general_researcher.py](core/researcher/general_researcher.py) - Changed signature from `mission_briefing: str` to `query: str, context: str`
+- ✅ Updated [core/ui/adapters/researcher_adapter.py](core/ui/adapters/researcher_adapter.py) - Passes query and context separately
+- ✅ [config/gpt_researcher.json](config/gpt_researcher.json) - Cleaned config, removed invalid STRATEGIC_LLM parameter
+- ✅ VCR cassettes recorded at [tests/cassettes/](tests/cassettes/) - Enables $0 test replays
+
+**Key Decisions**:
+- **VCR Pattern**: Record-once-replay-forever using pytest-recording (~$0.50 to record, $0 to replay)
+- **Bottom-up validation**: Document API → Unit test modules → Integration test → UI validation
+- **Query + Context separation**: Short question (HQ's `focus_question`) + detailed guidance (mission briefing transformer output)
+- **Systematic approach**: Stop thrashing, validate each layer before integration
+
+**Validation Results** (VCR test):
+- Without context: 11 sources, 19,452 chars
+- With context: 16 sources, 17,346 chars (+45% more sources, more focused output)
+- Generated comprehensive Warp.ai ICP analysis with firmographic, technographic, and behavioral characteristics
+
+**Issues Resolved**:
+1. **Config file corruption** → Removed invalid `STRATEGIC_LLM: "openai:o4-mini"` (non-existent model)
+2. **Mission briefing as query** → Split into query (short) + context (detailed)
+3. **Windows emoji encoding** → Removed emoji characters from print statements
+4. **Testing methodology** → Adopted VCR pattern to avoid API credit burn
+
+**Files Modified**:
+- `core/researcher/general_researcher.py` - Updated execute_research() and execute_multiple() signatures
+- `core/ui/adapters/researcher_adapter.py` - Passes query + context separately (line 228-233)
+- `config/gpt_researcher.json` - Cleaned configuration
+
+**Testing Pattern**:
+```bash
+# Record cassettes once (~$0.50):
+pytest tests/test_gpt_researcher_context.py --record-mode=once
+
+# Replay forever ($0):
+pytest tests/test_gpt_researcher_context.py
+```
 
 ---
 

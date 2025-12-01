@@ -8,6 +8,20 @@ Validates:
 - Handles network failures gracefully
 - Saves outputs correctly
 - Returns valid metadata
+
+IMPORTANT - COST AWARENESS:
+These tests use @pytest.mark.vcr() to record API responses to "cassettes".
+- First run (with --record-mode=once): Makes REAL Tavily API calls (~$0.10 each)
+- All future runs: Replays from cassettes ($0, instant)
+
+To record cassettes (ONLY DO THIS ONCE):
+    pytest tests/test_researcher.py --record-mode=once
+
+To run tests normally (replays from cassettes, $0):
+    pytest tests/test_researcher.py
+
+To force re-record (costs money):
+    pytest tests/test_researcher.py --record-mode=rewrite
 """
 
 import pytest
@@ -31,6 +45,8 @@ def temp_drop_path(tmp_path):
 class TestResearcherIsolation:
     """Test researcher capabilities in isolation."""
 
+    @pytest.mark.vcr()
+    @pytest.mark.expensive
     @pytest.mark.asyncio
     async def test_execute_simple_research(self, temp_drop_path):
         """
@@ -93,6 +109,8 @@ class TestResearcherIsolation:
 
         print(f"✅ Research completed: {output.token_count} tokens, {len(output.sources)} sources, ${output.cost:.2f}")
 
+    @pytest.mark.vcr()
+    @pytest.mark.expensive
     @pytest.mark.asyncio
     async def test_token_budget_warning(self, temp_drop_path, capsys):
         """
@@ -121,6 +139,8 @@ class TestResearcherIsolation:
             captured = capsys.readouterr()
             assert "WARNING" in captured.out, "❌ Should warn when output < 2000 tokens"
 
+    @pytest.mark.vcr()
+    @pytest.mark.expensive
     @pytest.mark.asyncio
     async def test_output_metadata_complete(self, temp_drop_path):
         """
@@ -161,6 +181,8 @@ class TestResearcherIsolation:
         assert metadata["runtime_seconds"] > 0, "❌ Runtime should be positive"
         assert metadata["sources_count"] >= 0, "❌ Sources count should be non-negative"
 
+    @pytest.mark.vcr()
+    @pytest.mark.expensive
     @pytest.mark.asyncio
     async def test_multiple_researchers_parallel(self, temp_drop_path):
         """
@@ -207,6 +229,8 @@ class TestResearcherIsolation:
 
         print(f"✅ Parallel research completed: {len(outputs)} researchers")
 
+    @pytest.mark.vcr()
+    @pytest.mark.expensive
     @pytest.mark.asyncio
     async def test_markdown_output_valid(self, temp_drop_path):
         """
@@ -276,6 +300,8 @@ class TestResearcherErrorHandling:
         # Should fail with informative error (not silent failure)
         assert exc_info.value is not None, "❌ Should raise exception for missing API key"
 
+    @pytest.mark.vcr()
+    @pytest.mark.expensive
     @pytest.mark.asyncio
     async def test_creates_drop_folder_if_missing(self, tmp_path):
         """

@@ -1,0 +1,5 @@
+{
+  "RETRIEVER": "tavily",
+  "REPORT_FORMAT": "markdown",
+  "VERBOSE": true
+}

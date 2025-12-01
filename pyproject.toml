@@ -10,14 +10,21 @@ requires-python = ">=3.10"
 dependencies = [
     "anthropic>=0.40.0",
     "gpt-researcher",
+    "openai",
     "pydantic",
     "python-dotenv",
+    "streamlit>=1.28.0",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0.0",
     "pytest-asyncio>=1.2.0",
+    "pytest-recording>=0.13.0",  # VCR pattern for recording/replaying HTTP
+    "ruff>=0.1.0",  # Fast linter
+    "vulture>=2.7",  # Dead code detection
+    "radon>=6.0.1",  # Complexity metrics
+    "coverage>=7.0.0",  # Test coverage
 ]
 
 [tool.setuptools.packages.find]
@@ -25,8 +32,5 @@ where = ["."]
 include = ["core*"]
 exclude = ["tests*", "logs*", "agents*", "prompts*", "projects*"]
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
+# NOTE: Pytest configuration moved to pytest.ini
+# See pytest.ini for VCR settings, markers, and test discovery

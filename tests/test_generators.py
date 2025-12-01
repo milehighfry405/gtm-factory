@@ -139,12 +139,14 @@ class TestLatestGenerator:
 
         print(f"[OK] User context loaded: {len(context)} chars")
 
+    @pytest.mark.vcr()
+    @pytest.mark.expensive
     @pytest.mark.asyncio
     async def test_synthesis_real_api_call(self):
         """
         ONE REAL TEST: Validate synthesis with actual GPT-4o call.
 
-        This is the ONLY test that makes an API call (~$0.10-0.15).
+        This test makes an API call (~$0.10-0.15) on first run, then replays from cassette.
         Validates end-to-end synthesis works.
         """
         generator = LatestGenerator()
@@ -249,12 +251,14 @@ class TestCriticalAnalystGenerator:
 
         print(f"[OK] Loaded {len(outputs)} researcher outputs for critical analysis")
 
+    @pytest.mark.vcr()
+    @pytest.mark.expensive
     @pytest.mark.asyncio
     async def test_critical_analysis_real_api_call(self):
         """
         ONE REAL TEST: Validate critical analysis with actual GPT-4o call.
 
-        This is the SECOND real API test (~$0.10-0.15).
+        This test makes an API call (~$0.10-0.15) on first run, then replays from cassette.
         Validates end-to-end critical analysis works.
         """
         generator = CriticalAnalystGenerator()

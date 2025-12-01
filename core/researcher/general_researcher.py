@@ -11,6 +11,9 @@ This module provides a thin wrapper that:
 
 import os
 import asyncio
+import logging
+import sys
+from io import StringIO
 from pathlib import Path
 from typing import Optional, Dict, Any
 from dataclasses import dataclass
@@ -18,6 +21,11 @@ from datetime import datetime
 
 from gpt_researcher import GPTResearcher
 from pydantic import BaseModel
+
+# Silence verbose gpt-researcher logging at the source
+logging.getLogger("gpt_researcher").setLevel(logging.ERROR)
+logging.getLogger("httpx").setLevel(logging.ERROR)
+logging.getLogger("httpcore").setLevel(logging.ERROR)
 
 
 @dataclass
@@ -76,7 +84,8 @@ class GeneralResearcher:
         self,
         model_fast: str = "openai:gpt-4o-mini",  # For summaries
         model_smart: str = "openai:gpt-4o",      # For report synthesis
-        verbose: bool = False
+        verbose: bool = False,
+        config_path: Optional[str] = None
     ):
         """
         Initialize GeneralResearcher.
@@ -85,24 +94,36 @@ class GeneralResearcher:
             model_fast: Model for fast operations (summaries). Default: gpt-4o-mini
             model_smart: Model for smart operations (report synthesis). Default: gpt-4o
             verbose: Enable debug logging
+            config_path: Path to gpt-researcher config JSON file
         """
         self.model_fast = model_fast
         self.model_smart = model_smart
         self.verbose = verbose
 
-        # Configure environment for gpt-researcher
-        # TODO: Switch back to GPT-5 models once streaming propagation is complete
-        #       Change defaults to: "openai:gpt-5-mini" and "openai:gpt-5"
-        #       GPT-5: 45% fewer factual errors than GPT-4o, 80% fewer with reasoning mode
-        # Currently using GPT-4o which supports streaming immediately
+        # Use config file if provided, otherwise default to project config
+        if config_path is None:
+            # Default to project config
+            project_root = Path(__file__).parent.parent.parent
+            config_path = str(project_root / "config" / "gpt_researcher.json")
+
+        self.config_path = config_path
+
+        # Verify config file exists
+        if not Path(config_path).exists():
+            print(f"WARNING: Config file not found: {config_path}")
+            print("         Using gpt-researcher defaults instead")
+        else:
+            print(f"[RESEARCHER] Using config: {config_path}")
+
+        # Set LLM models via env vars (overrides config file)
+        # TODO: Switch to GPT-5 when streaming ready (45% fewer errors)
         os.environ["FAST_LLM"] = model_fast
         os.environ["SMART_LLM"] = model_smart
-        os.environ["CURATE_SOURCES"] = "True"  # Extra LLM pass for source quality
-        os.environ["RETRIEVER"] = "tavily"  # Best search quality (requires TAVILY_API_KEY)
 
     async def execute_research(
         self,
-        mission_briefing: str,
+        query: str,
+        context: str,
         drop_path: Path,
         researcher_id: str = "researcher-1",
         max_retries: int = 2
@@ -111,8 +132,8 @@ class GeneralResearcher:
         Execute a single research task.
 
         Args:
-            mission_briefing: Full mission briefing from HQ (includes context, question,
-                            success criteria, token budget, constraints)
+            query: Short, focused research question (from HQ's focus_question)
+            context: Detailed research guidance (from mission briefing transformer)
             drop_path: Path to drop folder where output will be saved
             researcher_id: Identifier for this researcher (e.g., "researcher-1")
             max_retries: Number of retries on failure
@@ -131,17 +152,27 @@ class GeneralResearcher:
         # Execute research with retries
         for attempt in range(max_retries + 1):
             try:
-                # Initialize researcher with mission briefing
+                # Initialize researcher with query + context separation
+                # Key: query = short question, context = detailed guidance
                 researcher = GPTResearcher(
-                    query=mission_briefing,
-                    report_type="custom_report",  # Enables custom instructions
-                    tone="formal and objective",
+                    query=query,  # Short focused question
+                    context=context,  # Detailed mission briefing
+                    report_type="research_report",
+                    report_source="web_search",
+                    tone="detailed and analytical",
+                    config_path=self.config_path,
                     verbose=self.verbose
                 )
 
-                # Execute research
+                # Execute research (verbose output is controlled by config VERBOSE=false)
+                print(f"[{researcher_id}] Conducting research...")
+
                 await researcher.conduct_research()
+
+                print(f"[{researcher_id}] Writing report...")
                 findings = await researcher.write_report()
+
+                print(f"[{researcher_id}] Report complete: {len(findings)} characters")
 
                 # Get research metadata
                 sources = researcher.get_research_sources()
@@ -153,11 +184,27 @@ class GeneralResearcher:
                 # Estimate token count (rough: 1 token ~= 4 chars)
                 token_count = len(findings) // 4
 
+                # Print source quality summary
+                print(f"\n[{researcher_id}] RESEARCH SUMMARY:")
+                print(f"  Output: {token_count} tokens ({len(findings)} chars)")
+                print(f"  Sources: {len(sources)} used")
+                print(f"  Cost: ${cost:.2f}")
+                print(f"  Runtime: {runtime:.1f}s")
+
+                # Show top sources used
+                if sources:
+                    print(f"\n[{researcher_id}] TOP SOURCES:")
+                    for idx, source in enumerate(sources[:5], 1):
+                        url = source.get('url', 'N/A')
+                        title = source.get('title', 'Unknown')[:60]
+                        print(f"  {idx}. {title}")
+                        print(f"     {url}")
+
                 # Validate token budget (warn if outside 2-5K range)
                 if token_count < 2000:
-                    print(f"⚠️  WARNING: {researcher_id} output is {token_count} tokens (target: 2000-5000). May be incomplete.")
+                    print(f"\nWARNING: {researcher_id} output is {token_count} tokens (target: 2000-5000). May be incomplete.")
                 elif token_count > 5000:
-                    print(f"⚠️  WARNING: {researcher_id} output is {token_count} tokens (target: 2000-5000). Mission briefing may need refinement.")
+                    print(f"\nWARNING: {researcher_id} output is {token_count} tokens (target: 2000-5000). Mission briefing may need refinement.")
 
                 # Save findings to drop folder
                 output_file = drop_path / f"{researcher_id}-output.md"
@@ -188,14 +235,14 @@ class GeneralResearcher:
 
     async def execute_multiple(
         self,
-        mission_briefings: list[str],
+        research_tasks: list[tuple[str, str]],  # List of (query, context) pairs
         drop_path: Path
     ) -> list[ResearchOutput]:
         """
         Execute multiple research tasks in parallel.
 
         Args:
-            mission_briefings: List of mission briefings from HQ
+            research_tasks: List of (query, context) tuples - one per researcher
             drop_path: Path to drop folder
 
         Returns:
@@ -203,11 +250,12 @@ class GeneralResearcher:
         """
         tasks = [
             self.execute_research(
-                mission_briefing=briefing,
+                query=query,
+                context=context,
                 drop_path=drop_path,
                 researcher_id=f"researcher-{i+1}"
             )
-            for i, briefing in enumerate(mission_briefings)
+            for i, (query, context) in enumerate(research_tasks)
         ]
 
         return await asyncio.gather(*tasks)

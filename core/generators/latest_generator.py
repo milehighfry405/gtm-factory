@@ -51,7 +51,8 @@ class LatestGenerator:
         self,
         session_path: Path,
         drop_id: str,
-        existing_latest: Optional[str] = None
+        existing_latest: Optional[str] = None,
+        mode: str = "general"
     ) -> str:
         """
         Synthesize a new drop into latest.md (iterative synthesis).
@@ -60,9 +61,13 @@ class LatestGenerator:
             session_path: Path to session directory
             drop_id: Drop folder name (e.g., "drop-1")
             existing_latest: Existing latest.md content (for incremental update)
+            mode: Research mode ("icp-validation", "gtm-execution", or "general")
 
         Returns:
             Updated latest.md content (markdown string)
+            - ICP mode: ICP Hypothesis Document format
+            - GTM mode: GTM Playbook Document format
+            - General mode: Standard latest.md format
         """
         drop_path = session_path / "drops" / drop_id
 
@@ -76,12 +81,13 @@ class LatestGenerator:
             if latest_file.exists():
                 existing_latest = latest_file.read_text(encoding="utf-8")
 
-        # Synthesize using GPT-4o (iterative update)
+        # Synthesize using GPT-4o (iterative update, mode-aware)
         latest_md = self._synthesize_incremental(
             existing_latest=existing_latest,
             new_outputs=researcher_outputs,
             user_context=user_context,
-            drop_id=drop_id
+            drop_id=drop_id,
+            mode=mode
         )
 
         return latest_md
@@ -113,12 +119,14 @@ class LatestGenerator:
         existing_latest: Optional[str],
         new_outputs: List[Dict[str, str]],
         user_context: Optional[str],
-        drop_id: str
+        drop_id: str,
+        mode: str = "general"
     ) -> str:
         """
         Synthesize new findings into existing latest.md (iterative update).
 
         Uses XML-structured prompt following Anthropic guidance.
+        Mode-aware: generates ICP Hypothesis Document or general latest.md.
         """
         # Build context section
         context_parts = []
@@ -138,17 +146,68 @@ class LatestGenerator:
 
         context = "\n".join(context_parts)
 
+        # Build mode-specific instructions
+        if mode == "icp-validation":
+            task_description = "Update the ICP Hypothesis Document with new validation findings."
+            structure_guidance = """
+STRUCTURE (ICP Hypothesis Document):
+First drop: Create new ICP Hypothesis Document with:
+- Executive Summary (who is best customer, why, confidence level)
+- Fit Scores (A/B/C/D tiers with observable criteria)
+- Intent Signals (Clay-executable: first-party, third-party, environmental)
+- Hypothesis Evolution (what changed from assumptions to evidence)
+- Next Validation Steps
+
+Subsequent drops: Update fit scores, add/refine signals, track hypothesis evolution
+"""
+            specific_principles = """
+ICP-SPECIFIC PRINCIPLES:
+- Observable signals only: ❌ "innovative companies" → ✅ "adopted GPT-4 API within 3 months of launch"
+- Clay-executable: Every signal must be findable via Clay integrations
+- Evidence-based fit scores: A/B/C/D based on conversion lift, LTV, retention data
+- Invalidate assumptions: Track ~~Drop 1 assumed X~~ → Drop 2 evidence shows Y
+"""
+        elif mode == "gtm-execution":
+            task_description = "Update the GTM Playbook Document with new execution findings."
+            structure_guidance = """
+STRUCTURE (GTM Playbook Document):
+- Channel Validation (which channels work, evidence)
+- Messaging Framework (what resonates, pain points)
+- Execution Tactics (concrete playbooks)
+- Success Metrics (KPIs, benchmarks)
+"""
+            specific_principles = """
+GTM-SPECIFIC PRINCIPLES:
+- Tactical focus: Concrete playbooks, not theory
+- Metric-driven: Conversion rates, CAC, LTV for each channel/tactic
+- Evidence-based: Customer quotes, A/B test results, cohort analysis
+"""
+        else:  # general mode
+            task_description = "Update the living truth document (latest.md) with new research findings."
+            structure_guidance = """
+STRUCTURE:
+First drop: Create new latest.md with:
+- TL;DR (1-2 sentences)
+- Key Insights (organized by theme)
+- Strategic Implications
+- Actions
+
+Subsequent drops: Update existing sections, add new themes as needed
+"""
+            specific_principles = ""
+
         # Build instructions (following Anthropic's synthesis patterns + prompt engineering best practices)
         instructions = f"""
-TASK: Update the living truth document (latest.md) with new research findings.
+TASK: {task_description}
 
+Research Mode: {mode}
 Drop ID: {drop_id}
 Date: {datetime.now().strftime('%Y-%m-%d')}
 
 SYNTHESIS APPROACH (Chain of Thought):
 Before writing, think through:
 1. What are the key findings in the new research?
-2. Do any findings contradict existing claims in latest.md?
+2. Do any findings contradict existing claims?
 3. Where do new findings fit in the existing structure?
 4. What confidence level should each claim have?
 
@@ -158,20 +217,15 @@ SYNTHESIS PRINCIPLES:
 - Preserve strategic WHY: Keep user's decision context visible
 - Concise output: Target 1500-2000 tokens
 
+{specific_principles}
+
 CONTRADICTION HANDLING:
 When new findings contradict existing claims:
 - Keep old claim with strikethrough: ~~The MLOps market was $1.2B in 2023~~
 - Add new claim with source: The MLOps market is $2.2B in 2024 (Source: Drop {drop_id})
 - Maintain transparency: Show evolution of understanding
 
-STRUCTURE:
-First drop: Create new latest.md with:
-- TL;DR (1-2 sentences)
-- Key Insights (organized by theme)
-- Strategic Implications
-- Actions
-
-Subsequent drops: Update existing sections, add new themes as needed
+{structure_guidance}
 
 METADATA TO INCLUDE:
 - Last Updated: {datetime.now().strftime('%Y-%m-%d')}

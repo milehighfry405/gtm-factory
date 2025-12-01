@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "v0": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://mcp.v0.dev",
+        "--header",
+        "Authorization: Bearer ${V0_API_KEY}"
+      ],
+      "env": {}
+    }
+  }
+}

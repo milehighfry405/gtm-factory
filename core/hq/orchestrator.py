@@ -26,9 +26,15 @@ class HQOrchestrator:
     - Coordinate with memory manager for persistence
     - Synthesize findings into living truth documents
 
+    Supports multiple research modes via specialized prompts:
+    - "icp-validation": ICP hypothesis extraction and validation
+    - "gtm-execution": GTM strategy and execution research
+    - "general": Flexible research orchestration
+
     Attributes:
         client: Anthropic API client for Claude interactions
         model: Claude model identifier (default: claude-sonnet-4-5)
+        mode: Research mode determining specialized behavior
         system_prompt: XML-tagged system prompt defining orchestrator behavior
         conversation_history: List of message dicts (role, content)
         project_path: Path to current project directory
@@ -40,7 +46,8 @@ class HQOrchestrator:
         api_key: str,
         project_path: Path,
         session_id: str,
-        model: str = "claude-sonnet-4-5"
+        model: str = "claude-sonnet-4-5",
+        mode: str = "general"
     ):
         """
         Initialize HQ Orchestrator with project context.
@@ -50,29 +57,44 @@ class HQOrchestrator:
             project_path: Absolute path to /projects/{company-name}/
             session_id: Session identifier (e.g., "session-1-hypothesis")
             model: Claude model to use (default: claude-sonnet-4-5)
+            mode: Research mode ("icp-validation", "gtm-execution", or "general")
         """
         self.client = anthropic.Anthropic(api_key=api_key)
         self.model = model
         self.project_path = Path(project_path)
         self.session_id = session_id
+        self.mode = mode
         self.conversation_history: List[Dict[str, str]] = []
 
-        # Load system prompt from prompts/hq-orchestrator.md
+        # Load system prompt based on mode
         self.system_prompt = self._load_system_prompt()
 
     def _load_system_prompt(self) -> str:
         """
-        Load and format system prompt with XML tags.
+        Load and format system prompt with XML tags based on mode.
 
         Returns structured prompt following Anthropic's best practices:
         - XML tags for clarity
         - Role, job, inputs, outputs, constraints sections
         - Examples and critical rules
 
+        Loads mode-specific prompt:
+        - "icp-validation" -> hq-icp-validation.md
+        - "gtm-execution" -> hq-gtm-execution.md
+        - "general" -> hq-general.md
+
         Returns:
             Formatted system prompt string
         """
-        prompt_path = Path(__file__).parent.parent.parent / "prompts" / "hq-orchestrator.md"
+        # Map mode to prompt file
+        prompt_files = {
+            "icp-validation": "hq-icp-validation.md",
+            "gtm-execution": "hq-gtm-execution.md",
+            "general": "hq-general.md"
+        }
+
+        prompt_filename = prompt_files.get(self.mode, "hq-general.md")
+        prompt_path = Path(__file__).parent.parent.parent / "prompts" / prompt_filename
 
         if not prompt_path.exists():
             raise FileNotFoundError(f"System prompt not found at {prompt_path}")
@@ -88,6 +110,7 @@ class HQOrchestrator:
 <context>
 Project Path: {self.project_path}
 Session ID: {self.session_id}
+Research Mode: {self.mode}
 Current Date: {datetime.now().strftime('%Y-%m-%d')}
 </context>"""
 
@@ -193,20 +216,41 @@ Current Date: {datetime.now().strftime('%Y-%m-%d')}
                 ]
             }
         """
-        # Request drop plan from Claude
-        plan_request = """Based on our conversation, please create a research drop plan.
+        print("\n[HQ] extract_drop_plan() called")
+        print(f"[HQ] Conversation history: {len(self.conversation_history)} messages")
 
-If the user is ready for research (intent is clear), respond with a JSON drop plan.
-If more clarification is needed, respond with "NEEDS_CLARIFICATION" and ask more questions.
+        # Request drop plan from Claude based on EXISTING conversation context
+        # HQ has already had the conversation - now we're asking it to formalize the plan
+        plan_request = """The user has flipped the research flag and is ready to start research.
 
-Format your response as either:
-1. Valid JSON matching the drop plan schema (see system prompt)
-2. The string "NEEDS_CLARIFICATION" followed by your questions"""
+Based on our conversation above, create a research drop plan following the Drop Planning Framework in your system prompt.
 
+Respond with ONLY a valid JSON object matching this schema:
+{
+  "drop_id": "drop-N",
+  "hypothesis": "Brief statement of what we're validating",
+  "researchers_assigned": [
+    {
+      "researcher_type": "general-researcher",
+      "focus_question": "Specific question for this researcher to answer",
+      "context": "Strategic WHY from our conversation",
+      "token_budget": 4000
+    }
+  ]
+}
+
+Use the Decision Matrix in your system prompt to determine the right number of researchers (1-4).
+Ensure each researcher has a DISTINCT focus_question with no overlap.
+"""
+
+        print("[HQ] Requesting structured plan based on conversation context...")
         response = self.chat(plan_request, max_tokens=2048)
+        print(f"[HQ] Response received ({len(response)} chars)")
+        print(f"[HQ] Response preview: {response[:200]}...")
 
         # Check if more clarification needed
         if "NEEDS_CLARIFICATION" in response:
+            print("[HQ] Claude says NEEDS_CLARIFICATION - returning None")
             return None
 
         # Try to parse JSON from response
@@ -216,15 +260,19 @@ Format your response as either:
             json_end = response.rfind('}') + 1
 
             if json_start == -1 or json_end == 0:
+                print("[HQ] No JSON found in response - returning None")
                 return None
 
             plan_json = response[json_start:json_end]
+            print(f"[HQ] Attempting to parse JSON ({len(plan_json)} chars)")
             drop_plan = json.loads(plan_json)
 
+            print(f"[HQ] Successfully parsed drop plan with {len(drop_plan.get('researchers_assigned', []))} researchers")
             return drop_plan
 
-        except (json.JSONDecodeError, ValueError):
+        except (json.JSONDecodeError, ValueError) as e:
             # Failed to parse - treat as clarification needed
+            print(f"[HQ] JSON parsing failed: {str(e)}")
             return None
 
     def get_conversation_history(self) -> List[Dict[str, str]]:

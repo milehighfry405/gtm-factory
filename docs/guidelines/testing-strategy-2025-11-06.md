@@ -258,6 +258,42 @@ tests/
 
 ---
 
+## Gotchas and Common Issues
+
+### Windows Encoding (Emoji Issue)
+
+**Problem**: Windows console uses cp1252 encoding, which can't display Unicode emojis (✓, ✅, ❌, etc.)
+
+**Error**:
+```
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 0
+```
+
+**Solution**: Use ASCII alternatives in print statements:
+- ✓ → `[OK]`
+- ✅ → `[PASS]`
+- ❌ → `[FAIL]`
+- ⚠️ → `[WARN]`
+
+**Example**:
+```python
+# DON'T (will crash on Windows)
+print("✅ Test passed")
+
+# DO (works everywhere)
+print("[PASS] Test passed")
+```
+
+**Applies to**:
+- Test output messages (`test_*.py`)
+- Demo scripts (`tests/demos/*.py`)
+- Validation scripts
+- Any console output
+
+**Note**: This happened in Session 3 (Researcher tests) and Session 5 (UI validation). Document it once, avoid repeating the mistake.
+
+---
+
 ## Quick Reference
 
 **"Should I write a test for X?"**

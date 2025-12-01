@@ -51,6 +51,60 @@ ls docs/guidelines/*.md
 
 ---
 
+## Step 2.75: Check Testing Setup (Important for Cost Awareness)
+
+**Always mention testing info in onboarding output** - tests can burn API credits if used incorrectly.
+
+### Check if Cassettes Exist:
+```bash
+ls tests/cassettes/ 2>/dev/null || echo "Not recorded yet"
+```
+
+If cassettes exist, agent knows tests are ready to run ($0 cost).
+If not, agent knows to warn about recording cost.
+
+### Key Testing Facts:
+- **VCR Pattern Active**: Tests use pytest-recording to record/replay HTTP responses
+- **Default Mode**: `vcr_record_mode = none` (never records unless explicitly told)
+- **Cost Protection**: Expensive tests marked with `@pytest.mark.expensive`
+- **First Run**: Costs ~$1 to record cassettes (Tavily + OpenAI/Anthropic)
+- **Future Runs**: $0 (replays from cassettes)
+
+### Test Documentation Structure:
+```
+docs/guidelines/
+  ├── testing-quickstart.md           # Quick start (5 min read)
+  └── project-health-audit-2025-11-19.md  # Full testing strategy
+
+tests/
+  ├── README-TESTING.md               # Comprehensive testing guide
+  ├── cassettes/                      # VCR cassettes (may not exist yet)
+  ├── test_researcher.py              # 7 expensive tests (Tavily)
+  ├── test_generators.py              # 2 expensive tests (OpenAI)
+  └── pytest.ini                      # Config (in root)
+```
+
+### How to Run Tests Safely:
+
+**If cassettes don't exist yet** (first time):
+```bash
+# Record cassettes (costs ~$1 one-time)
+pytest -m expensive --record-mode=once
+```
+
+**Normal test runs** (free):
+```bash
+# Run all tests (replays from cassettes, $0)
+pytest
+
+# Run only cheap tests (no API calls at all)
+pytest -m "not expensive"
+```
+
+**CRITICAL**: Never run `pytest -m expensive --record-mode=rewrite` unless prompts changed - this re-records everything and costs money.
+
+---
+
 ## Step 3: Check Git Status
 
 ```bash
@@ -146,6 +200,18 @@ Chat-based GTM research system with compounding knowledge
 │ {guideline-1} - docs/guidelines/{file1}.md
 │ {guideline-2} - docs/guidelines/{file2}.md
 │ {guideline-3} - docs/guidelines/{file3}.md
+└─────────────────────────────────────────────────
+
+🧪 TESTING INFO
+┌─────────────────────────────────────────────────
+│ VCR Pattern: Record once (~$1), replay forever ($0)
+│ Cassettes: {exists OR "Not recorded yet - run: pytest -m expensive --record-mode=once"}
+│ Quick Start: docs/guidelines/testing-quickstart.md
+│ Full Guide: tests/README-TESTING.md
+│
+│ Commands:
+│   pytest                    # Run all tests (uses cassettes, $0)
+│   pytest -m "not expensive" # Skip API tests entirely
 └─────────────────────────────────────────────────
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

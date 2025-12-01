@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Market Viability Framework</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f172a;
+      min-height: 100vh;
+      padding: 3rem 2rem;
+      color: #e2e8f0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* Problem Statement */
+    .problem-block {
+      background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+      border: 1px solid #334155;
+      color: white;
+      padding: 2rem 2.5rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .problem-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #64748b;
+      margin-bottom: 0.5rem;
+    }
+    .problem-statement {
+      font-size: 1.75rem;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+    .problem-source {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: #475569;
+    }
+
+    /* Connector */
+    .connector {
+      display: flex;
+      justify-content: center;
+      padding: 0.5rem 0;
+    }
+    .connector-line {
+      width: 2px;
+      height: 30px;
+      background: #334155;
+    }
+    .connector-arrow {
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 10px solid #334155;
+      margin-top: -1px;
+    }
+
+    /* Step Blocks */
+    .step-block {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 1.75rem 2rem;
+      margin-bottom: 0.5rem;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+    .step-block:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .step-block.active {
+      border-color: #3b82f6;
+      border-width: 2px;
+    }
+    .step-block.passed {
+      border-color: #22c55e;
+      background: rgba(34, 197, 94, 0.1);
+    }
+    .step-block.failed {
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .step-number {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #334155;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #94a3b8;
+      flex-shrink: 0;
+    }
+    .step-block.passed .step-number {
+      background: #22c55e;
+      color: white;
+    }
+    .step-block.failed .step-number {
+      background: #ef4444;
+      color: white;
+    }
+    .step-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+    .step-title span {
+      font-weight: 400;
+      color: #94a3b8;
+      font-size: 0.95rem;
+    }
+
+    .step-definition {
+      font-size: 0.95rem;
+      color: #cbd5e1;
+      line-height: 1.6;
+      padding-left: 2.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .step-example {
+      padding-left: 2.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+      font-style: italic;
+      color: #94a3b8;
+    }
+    .step-checkpoint {
+      padding-left: 2.75rem;
+      padding-top: 1rem;
+      border-top: 1px solid #334155;
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+    .checkpoint-label {
+      color: #64748b;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-right: 0.5rem;
+    }
+    .step-checkpoint strong {
+      color: #22c55e;
+    }
+
+    /* Awareness Stages */
+    .awareness-stages {
+      display: flex;
+      gap: 0.5rem;
+      padding-left: 2.75rem;
+      margin-top: 1rem;
+    }
+    .stage {
+      padding: 0.35rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .stage-1 { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    .stage-2 { background: rgba(249, 115, 22, 0.2); color: #fb923c; }
+    .stage-3 { background: rgba(234, 179, 8, 0.2); color: #facc15; }
+    .stage-4 { background: rgba(132, 204, 22, 0.2); color: #a3e635; }
+    .stage-5 { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+
+    /* Awareness Stages Vertical */
+    .awareness-stages-vertical {
+      padding-left: 2.75rem;
+      margin-top: 1rem;
+    }
+    .stages-header {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+      padding-left: 0.25rem;
+    }
+    .stage-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.35rem;
+    }
+    .stage-row .stage {
+      width: 72px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .stage-desc {
+      font-size: 0.75rem;
+      color: #64748b;
+    }
+
+    /* Anatomy */
+    .step-anatomy {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding-left: 2.75rem;
+      margin-top: 0.75rem;
+    }
+    .anatomy-label {
+      font-size: 0.7rem;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .component {
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+    .component.tbd {
+      background: rgba(100, 116, 139, 0.15);
+      color: #64748b;
+      border: 1px dashed rgba(100, 116, 139, 0.4);
+      font-style: italic;
+    }
+
+    /* Outcome Block */
+    .outcome-block {
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      color: white;
+      padding: 1.5rem 2rem;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .outcome-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+    .outcome-text {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .outcome-subtext {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      margin-top: 0.25rem;
+    }
+
+    /* Interactive Controls */
+    .controls {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 1.25rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      min-width: 280px;
+    }
+    .controls-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+      margin-bottom: 1rem;
+    }
+    .control-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+    .control-label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #e2e8f0;
+    }
+    .control-toggle {
+      display: flex;
+      gap: 0.25rem;
+    }
+    .toggle-btn {
+      padding: 0.35rem 0.75rem;
+      border: 1px solid #475569;
+      background: #0f172a;
+      color: #94a3b8;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .toggle-btn:first-child {
+      border-radius: 6px 0 0 6px;
+    }
+    .toggle-btn:last-child {
+      border-radius: 0 6px 6px 0;
+    }
+    .toggle-btn.active {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+    }
+    .toggle-btn:hover:not(.active) {
+      background: #334155;
+    }
+
+    .diagnosis {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #334155;
+    }
+    .diagnosis-text {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+    .diagnosis-text strong {
+      color: #f1f5f9;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .controls {
+        position: relative;
+        bottom: auto;
+        right: auto;
+        margin-top: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Hero Title -->
+    <h1 style="text-align: center; font-size: 2rem; font-weight: 300; color: #e2e8f0; margin-bottom: 2.5rem; letter-spacing: -0.02em;">Develop a GTM Hypothesis</h1>
+
+    <!-- Problem Statement -->
+    <div class="problem-block">
+      <div class="problem-label">The Problem</div>
+      <div class="problem-statement">"Revenue is unpredictable."</div>
+    </div>
+
+    <div class="connector">
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <div class="connector-line"></div>
+        <div class="connector-arrow"></div>
+      </div>
+    </div>
+
+    <!-- Step 1: Pain -->
+    <div class="step-block" id="step-pain">
+      <div class="step-header">
+        <div class="step-number">1</div>
+        <div class="step-title">PAIN</div>
+      </div>
+      <div class="step-definition">
+        The problem exists and carries real cost. Like pathology, it's there whether anyone has diagnosed it yet. This is objective ground truth about your market. Either your ICP has this problem or they don't.
+      </div>
+      <div class="step-example">"Board meetings spent explaining variance instead of strategy."</div>
+      <div class="step-anatomy">
+        <span class="anatomy-label">Anatomy:</span>
+        <span class="component">Frequency</span>
+        <span class="component">Severity</span>
+        <span class="component">Scope</span>
+        <span class="component">Quantifiability</span>
+      </div>
+      <div class="step-checkpoint" id="pain-checkpoint">
+        <span class="checkpoint-label">After this gate:</span> The problem is real for this market.
+      </div>
+    </div>
+
+    <div class="connector">
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <div class="connector-line"></div>
+        <div class="connector-arrow"></div>
+      </div>
+    </div>
+
+    <!-- Step 2: Awareness -->
+    <div class="step-block" id="step-awareness">
+      <div class="step-header">
+        <div class="step-number">2</div>
+        <div class="step-title">AWARENESS</div>
+      </div>
+      <div class="step-definition">
+        They recognize the problem and can name it. They know something is wrong. We understand how they frame it, the language they use, what they attribute it to. Diagnosis has occurred on their side. Our frame and their frame are aligned.
+      </div>
+      <div class="step-example">"We don't have a revenue problem, we have a predictability problem."</div>
+      <div class="awareness-stages-vertical">
+        <div class="stages-header">Schwartz's 5 Stages of Awareness</div>
+        <div class="stage-row"><span class="stage stage-1">Unaware</span><span class="stage-desc">Don't know they have a problem</span></div>
+        <div class="stage-row"><span class="stage stage-2">Problem</span><span class="stage-desc">Know the problem, not solutions</span></div>
+        <div class="stage-row"><span class="stage stage-3">Solution</span><span class="stage-desc">Know solutions exist, not yours</span></div>
+        <div class="stage-row"><span class="stage stage-4">Product</span><span class="stage-desc">Know your product, not convinced</span></div>
+        <div class="stage-row"><span class="stage stage-5">Most</span><span class="stage-desc">Convinced, just need the offer</span></div>
+      </div>
+      <div class="step-checkpoint" id="awareness-checkpoint">
+        <span class="checkpoint-label">After this gate:</span> The problem is real and we understand how they see it.
+      </div>
+    </div>
+
+    <div class="connector">
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <div class="connector-line"></div>
+        <div class="connector-arrow"></div>
+      </div>
+    </div>
+
+    <!-- Step 3: Urgency -->
+    <div class="step-block" id="step-urgency">
+      <div class="step-header">
+        <div class="step-number">3</div>
+        <div class="step-title">URGENCY</div>
+      </div>
+      <div class="step-definition">
+        There's pressure to act now, not eventually. The condition is acute, not chronic. A trigger exists, a deadline is real, consequences follow if they wait. They're not passively researching. They're actively seeking treatment.
+      </div>
+      <div class="step-example">"Annual planning cycle kicks off in 60 days."</div>
+      <div class="step-anatomy">
+        <span class="anatomy-label">Anatomy:</span>
+        <span class="component">Trigger</span>
+        <span class="component">Deadline</span>
+        <span class="component">Consequence</span>
+      </div>
+      <div class="step-checkpoint" id="urgency-checkpoint">
+        <span class="checkpoint-label">After this gate:</span> Real, aligned, and compelled to act now.
+      </div>
+    </div>
+
+    <div class="connector">
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <div class="connector-line"></div>
+        <div class="connector-arrow"></div>
+      </div>
+    </div>
+
+    <!-- Outcome -->
+    <div class="outcome-block" id="outcome-block">
+      <div class="outcome-icon">&#10003;</div>
+      <div>
+        <div class="outcome-text">Viable Market</div>
+        <div class="outcome-subtext">Your hypothesis is validated. Execute GTM.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Controls (hidden for now - remove style to show) -->
+  <div class="controls" style="display: none;">
+    <div class="controls-title">Test Your ICP</div>
+
+    <div class="control-row">
+      <div class="control-label">Pain</div>
+      <div class="control-toggle">
+        <button class="toggle-btn" data-step="pain" data-value="low">Low</button>
+        <button class="toggle-btn active" data-step="pain" data-value="high">High</button>
+      </div>
+    </div>
+
+    <div class="control-row">
+      <div class="control-label">Awareness</div>
+      <div class="control-toggle">
+        <button class="toggle-btn" data-step="awareness" data-value="low">Low</button>
+        <button class="toggle-btn active" data-step="awareness" data-value="high">High</button>
+      </div>
+    </div>
+
+    <div class="control-row">
+      <div class="control-label">Urgency</div>
+      <div class="control-toggle">
+        <button class="toggle-btn" data-step="urgency" data-value="low">Low</button>
+        <button class="toggle-btn active" data-step="urgency" data-value="high">High</button>
+      </div>
+    </div>
+
+    <div class="diagnosis">
+      <div class="diagnosis-text" id="diagnosis">
+        <strong>Diagnosis:</strong> All gates passed. This is a viable market — execute.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      pain: 'high',
+      awareness: 'high',
+      urgency: 'high'
+    };
+
+    const diagnoses = {
+      'high-high-high': '<strong>Viable Market.</strong> All gates passed. Execute GTM.',
+      'low-high-high': '<strong>No Pain.</strong> Wrong ICP or wrong problem. They don\'t have this pain.',
+      'high-low-high': '<strong>Hidden Pain.</strong> They have it but don\'t see it. Education/rhetoric required.',
+      'high-high-low': '<strong>No Urgency.</strong> Chronic problem with no forcing function. Long sales cycle.',
+      'low-low-high': '<strong>Wrong Market.</strong> No pain, no awareness. Urgency is for something else.',
+      'low-high-low': '<strong>Wrong Market.</strong> They\'re aware of a problem you don\'t solve.',
+      'high-low-low': '<strong>Latent Market.</strong> Pain exists but hidden and not urgent. Very heavy lift.',
+      'low-low-low': '<strong>No Market.</strong> Nothing here. Pivot ICP or product entirely.'
+    };
+
+    function updateUI() {
+      const key = `${state.pain}-${state.awareness}-${state.urgency}`;
+
+      // Update step blocks
+      const steps = ['pain', 'awareness', 'urgency'];
+      let hitFailure = false;
+
+      steps.forEach((step, index) => {
+        const block = document.getElementById(`step-${step}`);
+
+        block.classList.remove('passed', 'failed', 'active');
+
+        if (hitFailure) {
+          // After a failure, subsequent steps are inactive
+          return;
+        }
+
+        if (state[step] === 'high') {
+          block.classList.add('passed');
+        } else {
+          block.classList.add('failed');
+          hitFailure = true;
+        }
+      });
+
+      // Update outcome
+      const outcome = document.getElementById('outcome-block');
+      if (state.pain === 'high' && state.awareness === 'high' && state.urgency === 'high') {
+        outcome.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
+        outcome.innerHTML = `
+          <div class="outcome-icon">&#10003;</div>
+          <div>
+            <div class="outcome-text">Viable Market</div>
+            <div class="outcome-subtext">Your hypothesis is validated. Execute GTM.</div>
+          </div>
+        `;
+      } else {
+        outcome.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+        outcome.innerHTML = `
+          <div class="outcome-icon">&#10007;</div>
+          <div>
+            <div class="outcome-text">Not Viable (Yet)</div>
+            <div class="outcome-subtext">Address the failed gate before executing.</div>
+          </div>
+        `;
+      }
+
+      // Update diagnosis
+      document.getElementById('diagnosis').innerHTML = diagnoses[key];
+    }
+
+    // Event listeners
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const step = btn.dataset.step;
+        const value = btn.dataset.value;
+
+        // Update state
+        state[step] = value;
+
+        // Update button active states
+        btn.parentElement.querySelectorAll('.toggle-btn').forEach(b => {
+          b.classList.remove('active');
+        });
+        btn.classList.add('active');
+
+        // Update UI
+        updateUI();
+      });
+    });
+
+    // Initial render
+    updateUI();
+  </script>
+</body>
+</html>
