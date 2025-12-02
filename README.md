@@ -1,103 +1,62 @@
 # GTM Factory
 
-## [finora.live](https://finora.live)
-**See the full framework →**
+## → [finora.live](https://finora.live)
 
 ---
 
-## The Problem
+## The Thesis
 
-**Revenue is unpredictable.**
+What used to be "best practices" — MEDDPICC, SPIN, Challenger — becomes table stakes with AI. Every SDR will have qualification frameworks baked into their workflow. That's not differentiation anymore. That's baseline.
 
-The industry has methodologies: MEDDPICC. BANT. SPIN. Challenger. They teach qualification - how to assess whether an opportunity is real.
+Differentiation moves upstream. To the strategic layer that decides *what* to qualify and *why*. To a system that captures the reasoning behind GTM decisions, learns from outcomes, and sharpens the hypothesis over time.
 
-They don't answer the harder question: *when a deal stalls, where exactly is it stuck?*
-
-They diagnose pass/fail. They don't prescribe what to do next.
+That's what I'm building toward.
 
 ---
 
-## The Discovery
+## What's Here
 
-Researching this, I traced modern sales methodologies back to their roots. Every one of them fragments the same source material: classical rhetoric.
+**A diagnostic framework with a rhetorical operating layer.**
 
-Aristotle's *Rhetoric*. Cicero's *De Inventione* and *De Oratore*. Quintilian's *Institutio Oratoria*.
+The diagnostic piece came first: three gated variables — Pain, Awareness, Urgency — that determine market viability. Sequential gates. Each must pass before the next matters. This tells you WHERE you're stuck.
 
-These aren't academic texts. They're operational frameworks for persuasion - how to move someone from knowing to acting. The Greeks and Romans treated this as the highest discipline. They mapped it completely.
+The problem: diagnosis without prescription is useless. Knowing "Awareness is low" doesn't tell you what to do about it.
 
-Modern GTM methodologies rediscovered pieces:
-- MEDDPICC's "Identified Pain" → Aristotle's stasis at Conjecture
-- Challenger's "Reframe" → Moving stasis from Conjecture to Definition
-- SPIN's "Implication Questions" → Pathos deployment
+So I went looking for an operational layer. What I found was classical rhetoric — Aristotle, Cicero, Quintilian. Not as historical curiosity, but as a systematic framework for moving people from knowing to acting.
 
-Nobody unified them. The original framework got lost.
+The mapping turned out to be useful:
 
----
+- **Stasis theory** tells you what's actually being contested (fact? definition? severity? timing?)
+- **The three proofs** (logos, pathos, ethos) tell you which lever to pull
+- **The five canons** give you a workflow from research through delivery
 
-## The Framework
+When a gate fails, the rhetoric prescribes what to do. Low Awareness? Stasis is stuck at Conjecture or Definition — lead with logos, prove the disease exists, reframe how they see it. No Urgency? Stasis is stuck at Quality — lead with pathos, amplify severity, surface consequences.
 
-Three gates. Sequential. Each must pass before the next matters.
-
-### Gate 1: PAIN
-*Does the problem exist?*
-
-Objective ground truth. Like pathology - present whether diagnosed or not.
-
-- **Stasis:** Conjecture (question of fact)
-- **Proof:** Logos (evidence)
-- **If it fails:** Wrong room. Pivot ICP or problem.
-
-### Gate 2: AWARENESS
-*Do they see it? Can they name it?*
-
-Frame alignment. Their vocabulary and yours must match.
-
-- **Stasis:** Definition (what IS this?)
-- **Proof:** Logos + Ethos (logic plus credibility to reframe)
-- **If it fails:** Hidden pain. Prove the disease exists.
-
-### Gate 3: URGENCY
-*Are they compelled to act NOW?*
-
-Pressure. Trigger. Deadline. Consequence.
-
-- **Stasis:** Quality + Procedure (severe enough? right time?)
-- **Proof:** Pathos (emotion - fear of loss beats aspiration)
-- **If it fails:** No forcing function. Amplify severity.
-
-### Outcome: VIABLE MARKET
-
-All gates passed. All stases resolved. Full rhetorical stack available.
+The framework unifies diagnosis with prescription.
 
 ---
 
-## The System (Paused)
-
-Building an AI system to execute this framework surfaced a harder question: *what exactly should it be doing?*
-
-Most AI GTM tools optimize execution speed. But execution of what? Based on what theory of how persuasion works?
-
-That question required going back to first principles. The framework had to come first. The system is infrastructure - this is the foundation it runs on.
+## Current State
 
 **What exists:**
-- [Live framework](https://finora.live) - Full diagnostic with rhetorical grounding
-- Research synthesis - 15,000+ words mapping classical sources to GTM
-- Core architecture (orchestrator, researchers, generators) - paused
+- [The framework](https://finora.live) — interactive visualization with rhetorical grounding
+- Research synthesis — comprehensive mapping of classical sources to GTM concepts
+- This hypothesis — being developed and validated
 
 **What's next:**
-- Signal mapping - making each gate observable
-- System integration with the framework as foundation
+- Signal mapping — making each gate observable and researchable
+- System architecture — agents that execute against the framework
 - Field validation
 
 ---
 
 ## Documentation
 
-Full research and development context in `/Learning`:
-- `gtm-framework-v4.html` - Visualization source
-- `phase 2 notes/gold_v2_*.md` - Complete rhetoric research
-- `GTM-FRAMEWORK-CONTEXT.md` - Framework decisions
+Development context lives in `/Learning`:
+- `gtm-framework-v4.html` — visualization source
+- `RHETORIC-AND-POWER-REFERENCE.md` — complete rhetoric research
+- `GTM-FRAMEWORK-CONTEXT.md` — framework decisions and reasoning
 
 ---
 
-*Building in public.*
+*Building in public. Following along: start with the framework link above.*
