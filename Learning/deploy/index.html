@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Market Viability Framework</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f172a;
+      min-height: 100vh;
+      padding: 3rem 2rem;
+      color: #e2e8f0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 300;
+      color: #e2e8f0;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 1rem;
+      color: #94a3b8;
+      margin-bottom: 3rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.6;
+    }
+
+    /* Concepts Section */
+    .concepts-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+    .concept-block {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    .concept-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #a78bfa;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+    }
+    .concept-headline {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      margin-bottom: 0.75rem;
+    }
+    .concept-text {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+    .concept-list {
+      margin-top: 0.75rem;
+      padding-left: 0;
+      list-style: none;
+    }
+    .concept-list li {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      margin-bottom: 0.4rem;
+      padding-left: 1rem;
+      position: relative;
+    }
+    .concept-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.5em;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #a78bfa;
+    }
+
+    /* Problem Statement */
+    .problem-block {
+      background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+      border: 1px solid #334155;
+      color: white;
+      padding: 2rem 2.5rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .problem-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #64748b;
+      margin-bottom: 0.5rem;
+    }
+    .problem-statement {
+      font-size: 1.75rem;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    /* Connector */
+    .connector {
+      display: flex;
+      justify-content: center;
+      padding: 0.75rem 0;
+    }
+    .connector-line {
+      width: 2px;
+      height: 40px;
+      background: #334155;
+    }
+    .connector-arrow {
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 10px solid #334155;
+      margin-top: -1px;
+    }
+
+    /* Step Blocks */
+    .step-block {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 0.5rem;
+      position: relative;
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .step-number {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #22c55e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 1rem;
+      color: white;
+      flex-shrink: 0;
+    }
+    .step-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .step-definition {
+      font-size: 1rem;
+      color: #cbd5e1;
+      line-height: 1.7;
+      margin-bottom: 1.25rem;
+    }
+
+    .step-example {
+      font-size: 0.95rem;
+      font-style: italic;
+      color: #94a3b8;
+      margin-bottom: 1.5rem;
+      padding-left: 1rem;
+      border-left: 2px solid #475569;
+    }
+
+    /* Anatomy */
+    .anatomy-section {
+      margin-bottom: 1.5rem;
+    }
+    .section-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #64748b;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    .anatomy-pills {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .component {
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    /* Rhetoric Section */
+    .rhetoric-section {
+      background: rgba(139, 92, 246, 0.08);
+      border: 1px solid rgba(139, 92, 246, 0.2);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .rhetoric-header {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #a78bfa;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+    .rhetoric-row {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      align-items: baseline;
+    }
+    .rhetoric-row:last-child {
+      margin-bottom: 0;
+    }
+    .rhetoric-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #c4b5fd;
+    }
+    .rhetoric-value {
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+    .rhetoric-value strong {
+      color: #f1f5f9;
+    }
+
+    /* Failure Section */
+    .failure-section {
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .failure-header {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #f87171;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+    }
+    .failure-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fca5a5;
+      margin-bottom: 0.75rem;
+    }
+    .failure-text {
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+    .failure-action {
+      font-size: 0.9rem;
+      color: #f1f5f9;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(239, 68, 68, 0.2);
+    }
+    .failure-action strong {
+      color: #4ade80;
+    }
+
+    /* Checkpoint */
+    .checkpoint {
+      padding-top: 1rem;
+      border-top: 1px solid #334155;
+      font-size: 0.9rem;
+      color: #94a3b8;
+    }
+    .checkpoint-label {
+      color: #64748b;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-right: 0.5rem;
+    }
+    .checkpoint strong {
+      color: #22c55e;
+    }
+
+    /* Schwartz Stages */
+    .stages-section {
+      margin-bottom: 1.5rem;
+    }
+    .stages-flow {
+      display: flex;
+      align-items: stretch;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+    .stage-item {
+      flex: 1;
+      min-width: 100px;
+      padding: 0.75rem;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .stage-name {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.35rem;
+    }
+    .stage-desc {
+      font-size: 0.7rem;
+      line-height: 1.4;
+    }
+    .stage-1 { background: rgba(239, 68, 68, 0.15); }
+    .stage-1 .stage-name { color: #f87171; }
+    .stage-1 .stage-desc { color: #fca5a5; }
+    .stage-2 { background: rgba(249, 115, 22, 0.15); }
+    .stage-2 .stage-name { color: #fb923c; }
+    .stage-2 .stage-desc { color: #fdba74; }
+    .stage-3 { background: rgba(234, 179, 8, 0.15); }
+    .stage-3 .stage-name { color: #facc15; }
+    .stage-3 .stage-desc { color: #fde047; }
+    .stage-4 { background: rgba(132, 204, 22, 0.15); }
+    .stage-4 .stage-name { color: #a3e635; }
+    .stage-4 .stage-desc { color: #bef264; }
+    .stage-5 { background: rgba(34, 197, 94, 0.15); }
+    .stage-5 .stage-name { color: #4ade80; }
+    .stage-5 .stage-desc { color: #86efac; }
+
+    /* Kairos Section */
+    .kairos-section {
+      background: rgba(139, 92, 246, 0.08);
+      border: 1px solid rgba(139, 92, 246, 0.2);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .kairos-header {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #a78bfa;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    .kairos-subtitle {
+      font-size: 0.9rem;
+      color: #c4b5fd;
+      margin-bottom: 1rem;
+      font-style: italic;
+    }
+    .kairos-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+    .kairos-item {
+      text-align: center;
+      padding: 1rem;
+      background: rgba(139, 92, 246, 0.1);
+      border-radius: 8px;
+    }
+    .kairos-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #c4b5fd;
+      margin-bottom: 0.5rem;
+    }
+    .kairos-desc {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      line-height: 1.4;
+    }
+
+    /* Outcome Block */
+    .outcome-block {
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      color: white;
+      padding: 2rem;
+      border-radius: 12px;
+    }
+    .outcome-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .outcome-icon {
+      width: 48px;
+      height: 48px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+    .outcome-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .outcome-text {
+      font-size: 0.95rem;
+      opacity: 0.95;
+      line-height: 1.6;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .concepts-section {
+        grid-template-columns: 1fr;
+      }
+      .rhetoric-row {
+        grid-template-columns: 1fr;
+        gap: 0.25rem;
+      }
+      .kairos-grid {
+        grid-template-columns: 1fr;
+      }
+      .stages-flow {
+        flex-direction: column;
+      }
+      .stage-item {
+        min-width: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Market Viability Framework</h1>
+    <p class="subtitle">A diagnostic framework grounded in classical rhetoric. It tells you WHERE you're stuck and WHAT to do about it.</p>
+
+    <!-- Core Concepts -->
+    <div class="concepts-section">
+      <div class="concept-block">
+        <div class="concept-title">Stasis Theory</div>
+        <div class="concept-headline">Where is the disagreement?</div>
+        <div class="concept-text">
+          From Cicero and Quintilian. Before you can win an argument, you must identify what's actually being contested. Most sales fail because seller and buyer are arguing at different levels.
+        </div>
+        <ul class="concept-list">
+          <li><strong>Conjecture</strong> - Does this thing exist? Is it real?</li>
+          <li><strong>Definition</strong> - What IS it? How should we classify it?</li>
+          <li><strong>Quality</strong> - Is it good or bad? Severe or mild?</li>
+          <li><strong>Procedure</strong> - Is this the right time/place/process?</li>
+        </ul>
+      </div>
+      <div class="concept-block">
+        <div class="concept-title">The Three Proofs</div>
+        <div class="concept-headline">What moves people to act?</div>
+        <div class="concept-text">
+          From Aristotle. There are only three ways to persuade: through logic, through credibility, or through emotion. Each gate in this framework has a dominant proof.
+        </div>
+        <ul class="concept-list">
+          <li><strong>Logos</strong> - Logical argument. Facts, data, reasoning.</li>
+          <li><strong>Ethos</strong> - Credibility. Trust, expertise, goodwill.</li>
+          <li><strong>Pathos</strong> - Emotion. Fear, desire, urgency.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Problem Statement -->
+    <div class="problem-block">
+      <div class="problem-label">The Problem</div>
+      <div class="problem-statement">"Revenue is unpredictable."</div>
+    </div>
+
+    <div class="connector">
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <div class="connector-line"></div>
+        <div class="connector-arrow"></div>
+      </div>
+    </div>
+
+    <!-- Gate 1: Pain -->
+    <div class="step-block">
+      <div class="step-header">
+        <div class="step-number">1</div>
+        <div class="step-title">PAIN</div>
+      </div>
+
+      <div class="step-definition">
+        The problem exists and carries real cost. Like pathology, it's there whether anyone has diagnosed it yet. This is objective ground truth about your market. Either your ICP has this problem or they don't.
+      </div>
+
+      <div class="step-example">"Board meetings spent explaining variance instead of strategy."</div>
+
+      <div class="anatomy-section">
+        <div class="section-label">Anatomy of Pain</div>
+        <div class="anatomy-pills">
+          <span class="component">Frequency - How often does it hurt?</span>
+          <span class="component">Severity - How bad when it does?</span>
+          <span class="component">Scope - Who feels it?</span>
+          <span class="component">Quantifiability - Can you measure it?</span>
+        </div>
+      </div>
+
+      <div class="rhetoric-section">
+        <div class="rhetoric-header">The Rhetoric</div>
+        <div class="rhetoric-row">
+          <div class="rhetoric-label">Stasis</div>
+          <div class="rhetoric-value"><strong>Conjecture</strong> - "Does this problem exist?" This is a question of fact. Either the disease is present in this population or it isn't.</div>
+        </div>
+        <div class="rhetoric-row">
+          <div class="rhetoric-label">Dominant Proof</div>
+          <div class="rhetoric-value"><strong>Logos</strong> - Logic and evidence. You prove pain exists through data, metrics, and observable patterns. This is not about feelings yet.</div>
+        </div>
+      </div>
+
+      <div class="failure-section">
+        <div class="failure-header">If This Gate Fails</div>
+        <div class="failure-title">Wrong Room</div>
+        <div class="failure-text">
+          The disease doesn't exist for this ICP. No rhetorical move fixes this. You're not losing the argument - you're in the wrong argument entirely. The stasis at Conjecture has failed at the objective level.
+        </div>
+        <div class="failure-action">
+          <strong>Action:</strong> Pivot your ICP or your problem hypothesis. You're talking to the wrong people about the wrong thing.
+        </div>
+      </div>
+
+      <div class="checkpoint">
+        <span class="checkpoint-label">After this gate:</span> <strong>We know the problem is real for this market.</strong>
+      </div>
+    </div>
+
+    <div class="connector">
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <div class="connector-line"></div>
+        <div class="connector-arrow"></div>
+      </div>
+    </div>
+
+    <!-- Gate 2: Awareness -->
+    <div class="step-block">
+      <div class="step-header">
+        <div class="step-number">2</div>
+        <div class="step-title">AWARENESS</div>
+      </div>
+
+      <div class="step-definition">
+        They recognize the problem and can name it. They know something is wrong. We understand how they frame it, the language they use, what they attribute it to. Our frame and their frame are aligned.
+      </div>
+
+      <div class="step-example">"We don't have a revenue problem, we have a predictability problem."</div>
+
+      <div class="stages-section">
+        <div class="section-label">Schwartz's 5 Stages of Awareness</div>
+        <div class="stages-flow">
+          <div class="stage-item stage-1">
+            <div class="stage-name">Unaware</div>
+            <div class="stage-desc">Don't know they have a problem</div>
+          </div>
+          <div class="stage-item stage-2">
+            <div class="stage-name">Problem</div>
+            <div class="stage-desc">Know the problem, not solutions</div>
+          </div>
+          <div class="stage-item stage-3">
+            <div class="stage-name">Solution</div>
+            <div class="stage-desc">Know solutions exist, not yours</div>
+          </div>
+          <div class="stage-item stage-4">
+            <div class="stage-name">Product</div>
+            <div class="stage-desc">Know your product, not convinced</div>
+          </div>
+          <div class="stage-item stage-5">
+            <div class="stage-name">Most Aware</div>
+            <div class="stage-desc">Convinced, just need the offer</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rhetoric-section">
+        <div class="rhetoric-header">The Rhetoric</div>
+        <div class="rhetoric-row">
+          <div class="rhetoric-label">Stasis</div>
+          <div class="rhetoric-value"><strong>Definition</strong> - "What IS this thing? How do they see it?" This is about frame alignment. You call it "revenue operations inefficiency." They call it "my sales team sucks." Until frames align, you're talking past each other.</div>
+        </div>
+        <div class="rhetoric-row">
+          <div class="rhetoric-label">Dominant Proof</div>
+          <div class="rhetoric-value"><strong>Logos + Ethos</strong> - Logic to prove your reframe is correct, but also credibility. Reframing someone's understanding of their own problem requires trust. They need to believe you see something they don't.</div>
+        </div>
+      </div>
+
+      <div class="failure-section">
+        <div class="failure-header">If This Gate Fails</div>
+        <div class="failure-title">Hidden Pain</div>
+        <div class="failure-text">
+          They have the disease but don't see it or misname it. From their perspective, the stasis is still at Conjecture ("Do I even have this problem?") or Definition ("This isn't what you're calling it"). They're not denying the solution - they're denying the diagnosis.
+        </div>
+        <div class="failure-action">
+          <strong>Action:</strong> Education with persuasive intent. Prove the disease exists using their language. Reframe how they see it. Move them from Unaware to Problem Aware on Schwartz's spectrum.
+        </div>
+      </div>
+
+      <div class="checkpoint">
+        <span class="checkpoint-label">After this gate:</span> <strong>The problem is real and we understand how they see it.</strong>
+      </div>
+    </div>
+
+    <div class="connector">
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <div class="connector-line"></div>
+        <div class="connector-arrow"></div>
+      </div>
+    </div>
+
+    <!-- Gate 3: Urgency -->
+    <div class="step-block">
+      <div class="step-header">
+        <div class="step-number">3</div>
+        <div class="step-title">URGENCY</div>
+      </div>
+
+      <div class="step-definition">
+        There's pressure to act now, not eventually. The condition is acute, not chronic. A trigger exists, a deadline is real, consequences follow if they wait. They're not passively researching - they're actively seeking treatment.
+      </div>
+
+      <div class="step-example">"Annual planning cycle kicks off in 60 days."</div>
+
+      <div class="anatomy-section">
+        <div class="section-label">Anatomy of Urgency</div>
+        <div class="anatomy-pills">
+          <span class="component">Trigger - What created the pressure?</span>
+          <span class="component">Deadline - When must they act?</span>
+          <span class="component">Consequence - What happens if they don't?</span>
+        </div>
+      </div>
+
+      <div class="kairos-section">
+        <div class="kairos-header">Kairos - The Opportune Moment</div>
+        <div class="kairos-subtitle">Urgency answers "Is there pressure?" Kairos asks "Is the window open NOW?"</div>
+        <div class="kairos-grid">
+          <div class="kairos-item">
+            <div class="kairos-label">Readiness</div>
+            <div class="kairos-desc">Is the audience in a state to receive this? Emotionally, cognitively, politically?</div>
+          </div>
+          <div class="kairos-item">
+            <div class="kairos-label">Ripeness</div>
+            <div class="kairos-desc">Have conditions matured? Budget, mandate, pain severity, political capital?</div>
+          </div>
+          <div class="kairos-item">
+            <div class="kairos-label">Decay</div>
+            <div class="kairos-desc">Is the moment passing? Attention shifting, alternatives emerging, urgency fading?</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rhetoric-section">
+        <div class="rhetoric-header">The Rhetoric</div>
+        <div class="rhetoric-row">
+          <div class="rhetoric-label">Stasis</div>
+          <div class="rhetoric-value"><strong>Quality + Procedure</strong> - "Is it severe enough to act?" (Quality) and "Is NOW the right time?" (Procedure). They agree the problem exists and what it is. They're stuck on whether it warrants action and whether this is the moment.</div>
+        </div>
+        <div class="rhetoric-row">
+          <div class="rhetoric-label">Dominant Proof</div>
+          <div class="rhetoric-value"><strong>Pathos</strong> - Emotion. This is where logic takes a back seat. Fear of loss is more powerful than hope for gain. Consequences of inaction, competitive threats, missed windows. You're not convincing their mind - you're moving their gut.</div>
+        </div>
+      </div>
+
+      <div class="failure-section">
+        <div class="failure-header">If This Gate Fails</div>
+        <div class="failure-title">No Forcing Function</div>
+        <div class="failure-text">
+          They know the problem and what to call it, but aren't compelled to act NOW. The disease is chronic, not acute. There's no deadline, no trigger, no consequence for waiting. The stasis is stuck at Quality ("not severe enough to prioritize") or Procedure ("not the right time for this initiative").
+        </div>
+        <div class="failure-action">
+          <strong>Action:</strong> Amplify severity. Surface consequences of inaction. Create or reveal forcing functions. Fear of loss beats aspiration. Make the status quo untenable.
+        </div>
+      </div>
+
+      <div class="checkpoint">
+        <span class="checkpoint-label">After this gate:</span> <strong>Real, aligned, and compelled to act now.</strong>
+      </div>
+    </div>
+
+    <div class="connector">
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <div class="connector-line"></div>
+        <div class="connector-arrow"></div>
+      </div>
+    </div>
+
+    <!-- Outcome -->
+    <div class="outcome-block">
+      <div class="outcome-header">
+        <div class="outcome-icon">&#10003;</div>
+        <div class="outcome-title">Viable Market</div>
+      </div>
+      <div class="outcome-text">
+        All three gates passed. All stases resolved. The problem is real (Conjecture). They see it clearly (Definition). They're compelled to act now (Quality + Procedure). You have the full rhetorical stack available: Logos to prove, Ethos to trust, Pathos to move. Execute.
+      </div>
+    </div>
+  </div>
+</body>
+</html>
