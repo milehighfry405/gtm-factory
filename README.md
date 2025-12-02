@@ -48,9 +48,9 @@ Field sales becomes MORE important, not less — because everything around it is
 
 Development context in `/Learning`:
 - `gtm-framework-v4.html` — visualization source
-- `RHETORIC-AND-POWER-REFERENCE.md` — complete rhetoric research (Parts 1-4)
 - `GTM-FRAMEWORK-CONTEXT.md` — framework decisions and reasoning
 - `VISUALIZATION-SPEC.md` — spec used to build the visualization
+- `phase 2 notes/gold_v2_research and output (w update) combined.md` — complete rhetoric research (Parts 1-4)
 
 ---
 
